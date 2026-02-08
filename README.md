@@ -134,6 +134,14 @@ This ensures realistic evaluation and prevents temporal data leakage.
   - Add tag or embedding-based content features.
   - Explore session/context-aware models.
   - Optimize long-term engagement with reinforcement learning.
+---
+## 📫 Contact / Support
+
+- For questions, suggestions, or support, please open an issue on the [GitHub repository](https://github.com/Tarun-Chowdary/ReelSense/issues).
+- You can also reach out via email: yegi.2992@gmail.com
+
+We welcome feedback and contributions!
+
 
   ### Author
 
