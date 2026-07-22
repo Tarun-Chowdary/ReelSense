@@ -16,6 +16,8 @@ Expects (relative to project root, one level up from this file):
 """
 
 import pickle
+import os
+from dotenv import load_dotenv
 import math
 from pathlib import Path
 from collections import Counter
@@ -42,6 +44,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+load_dotenv()
+
+API_KEY = os.getenv("apikey")
 # ---------------------------------------------------------------------------
 # Load data + model once at startup
 # ---------------------------------------------------------------------------
