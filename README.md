@@ -158,31 +158,6 @@ or simply use the **Live Server** extension in VS Code.
 
 ---
 
-## 📁 Project Structure
-
-```text
-ReelSense
-│
-├── backend
-│   ├── main.py
-│   ├── requirements.txt
-│   └── .env
-│
-├── data
-│   ├── raw
-│   └── processed
-│
-├── frontend
-│   └── index.html
-│
-├── models
-│   └── svd_model.pkl
-│
-└── README.md
-```
-
----
-
 ## 🛠 API Endpoints
 
 | Method | Endpoint                  | Description                            |
