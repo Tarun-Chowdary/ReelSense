@@ -601,26 +601,27 @@
 
   <script>
     const API = "https://reelsense-ajru.onrender.com/api";
-    const key = "cba6e552";
-
-    // const tmdbKeyInput = document.getElementById("tmdb-key");
-    // tmdbKeyInput.value = localStorage.getItem("reelsense_omdb_key") || "";
-    // tmdbKeyInput.addEventListener("change", () => {
-    //   localStorage.setItem("reelsense_omdb_key", tmdbKeyInput.value.trim());
-    // });
-
+  
     async function fetchPosterUrl(imdbId) {
-      const key = localStorage.getItem("reelsense_omdb_key");
-      if (!key || !imdbId) return null;
-      try {
-        const res = await fetch(`https://www.omdbapi.com/?i=${imdbId}&apikey=${key}`);
-        if (!res.ok) return null;
-        const data = await res.json();
-        return (data.Poster && data.Poster !== "N/A") ? data.Poster : null;
-      } catch {
-        return null;
+        const key = "cf3e1d7";
+
+        if (!imdbId) return null;
+
+        try {
+          const res = await fetch(`https://www.omdbapi.com/?i=${imdbId}&apikey=${key}`);
+
+          if (!res.ok) return null;
+
+          const data = await res.json();
+
+          return (data.Poster && data.Poster !== "N/A")
+            ? data.Poster
+            : null;
+        } catch (err) {
+          console.error(err);
+          return null;
+        }
       }
-    }
 
     const QUESTIONS = [
       {
@@ -805,18 +806,18 @@
     `).join("");
 
         // Swap in real posters where available; generated gradient stays as fallback.
-        if (localStorage.getItem("reelsense_omdb_key")) {
-          data.recommendations.forEach(async (r, i) => {
-            const url = await fetchPosterUrl(r.imdbId);
-            if (!url) return;
-            const el = document.getElementById(`poster-${i}`);
-            if (el) {
-              el.style.backgroundImage = `url('${url}')`;
-              el.style.backgroundSize = "cover";
-              el.style.backgroundPosition = "center";
-            }
-          });
-        }
+        // Swap in real posters where available; generated gradient stays as fallback.
+        data.recommendations.forEach(async (r, i) => {
+          const url = await fetchPosterUrl(r.imdbId);
+          if (!url) return;
+
+          const el = document.getElementById(`poster-${i}`);
+          if (el) {
+            el.style.backgroundImage = `url('${url}')`;
+            el.style.backgroundSize = "cover";
+            el.style.backgroundPosition = "center";
+          }
+        });
       } catch (e) {
         status.classList.add("error");
         status.textContent = e.message;
