@@ -1,151 +1,62 @@
-# 🎬 ReelSense
+# ReelSense Web
 
-## Explainable, Diversity-aware Movie Recommender
+A full-stack website for your ReelSense recommender: a FastAPI backend that loads your **real trained SVD model** and serves live Top-K recommendations, plus a browser frontend (cinema-ticket themed) that calls it.
 
----
+```
+reelsense-web/
+├── backend/
+│   ├── main.py            # FastAPI app (predictions, explanations, diversity metrics)
+│   └── requirements.txt
+├── frontend/
+│   └── index.html         # single-file UI, no build step needed
+├── data/
+│   ├── raw/movies.csv          ← copy from your ReelSense repo
+│   └── processed/train_ratings.csv  ← copy from your ReelSense repo
+└── models/
+    └── svd_model.pkl       ← copy from your ReelSense repo
+```
 
-## 📌 Overview
+## 1. Copy in your trained artifacts
 
-ReelSense is an explainable, diversity-aware movie recommendation system built using the **MovieLens Latest Small** dataset.  
-Unlike traditional recommender systems that focus only on rating prediction, ReelSense emphasizes:
+From your existing `ReelSense` project folder, copy:
 
-- Personalized **Top-K recommendations**
-- **Explainability** (why a movie is recommended)
-- **Diversity and novelty** to reduce popularity bias
+```bash
+cp ReelSense/data/raw/movies.csv               reelsense-web/data/raw/
+cp ReelSense/data/processed/train_ratings.csv  reelsense-web/data/processed/
+cp ReelSense/models/svd_model.pkl              reelsense-web/models/
+```
 
-The system combines **collaborative filtering**, **content-based modeling**, and **explicit diversity evaluation**, aligning with modern recommender system research and hackathon requirements.
+(Paths already match your repo layout from `main.py`, so no renaming needed.)
 
----
+## 2. Install backend dependencies
 
-## 🎯 Key Features
+```bash
+cd reelsense-web/backend
+python -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-- ✔ Collaborative Filtering using **Matrix Factorization (SVD)**
-- ✔ Hybrid recommender (**CF + Genre-based content similarity**)
-- ✔ Natural language explanations for recommendations
-- ✔ Time-aware preprocessing (leave-last-one-per-user split)
-- ✔ Diversity & novelty evaluation
-  - Intra-List Diversity
-  - Catalog Coverage
-  - Popularity-based Novelty
-- ✔ Clean, reproducible ML pipeline using notebooks
+> Your `svd_model.pkl` was trained with the `surprise` library (`svd.predict(user_id, movie_id).est`), so `scikit-surprise` is required to unpickle and call it. If pip has trouble building it, install a C++ build tool chain first (on Windows: "Microsoft C++ Build Tools"; on Mac: `xcode-select --install`).
 
----
+## 3. Run it
 
-## 📂 Dataset
+```bash
+uvicorn main:app --reload --port 8000
+```
 
-**MovieLens Latest Small**
+Open **http://localhost:8000** — the backend serves the frontend directly, so there's nothing else to start.
 
-- 100,836 ratings
-- 610 users
-- 9,742 movies
+## What it does
 
-**Files used:**
+- **`GET /api/users`** — lists user IDs available in your training set, populates the dropdown.
+- **`GET /api/recommend/{user_id}?k=10`** — runs your SVD model against every unseen movie for that user, ranks by predicted rating, and returns the Top-K along with:
+  - a plain-language **explanation** per movie (genre overlap with that user's highly-rated history)
+  - **intra-list diversity**, **average novelty**, and **catalog coverage** for that specific list
+- The frontend renders each recommendation as a torn-ticket card: predicted score on the stub, genres as chips, explanation alongside.
 
-- `ratings.csv`
-- `movies.csv`
-- `tags.csv`
-- `links.csv`
+## Extending it
 
-Source: https://grouplens.org/datasets/movielens/latest/
-
----
-
-## 🧹 Data Processing
-
-- Converted timestamps to datetime format
-- Applied **time-aware train–test split** (leave-last-one per user)
-- Cleaned and standardized movie genres and tags
-- Saved processed datasets for reproducibility
-
-This ensures realistic evaluation and prevents temporal data leakage.
-
----
-
-## 🧠 Methodology
-
-### 1. Collaborative Filtering
-
-- Implemented using **Singular Value Decomposition (SVD)**
-- Learns latent user and item representations
-- Optimized using RMSE and MAE on a held-out temporal test set
-
-### 2. Hybrid Recommendation
-
-- Combines SVD predicted ratings with **genre-based similarity**
-- Genre text is vectorized using TF-IDF
-- Final recommendation score is a weighted combination of:
-  - Predicted rating (personalization)
-  - Content similarity (diversity & relevance)
-
-### 3. Explainability
-
-- Generates human-readable explanations using:
-
-  ReelSense is an explainable, diversity-aware movie recommendation project built on the MovieLens Latest Small dataset. It combines collaborative filtering, content signals, and explicit diversity evaluation to produce accurate, transparent, and less popularity-biased Top-K recommendations.
-
-  ### Key Features
-  - **Collaborative filtering (SVD):** Matrix factorization for personalized scores.
-  - **Hybrid scoring:** Combines SVD predictions with TF–IDF genre similarity.
-  - **Explainability:** Human-readable reasons using past likes and genre overlap.
-  - **Diversity & novelty metrics:** Intra-list diversity, catalog coverage, popularity-based novelty.
-  - **Time-aware evaluation:** Leave-last-one-per-user split to avoid temporal leakage.
-
-  ### Dataset
-  - MovieLens Latest Small (ratings.csv, movies.csv, tags.csv, links.csv)
-  - ~100k ratings, ~610 users, ~9.7k movies
-
-  ### Project Structure
-
-  ReelSense/
-  - data/
-    - raw/
-    - processed/
-  - models/
-    - svd_model.pkl
-  - notebooks/
-    - 01_eda.ipynb
-    - 02_preprocessing.ipynb
-    - 03_svd_model.ipynb
-    - 04_topk_recommendations.ipynb
-    - 05_explainability.ipynb
-    - 06_hybrid_recommender.ipynb
-    - 07_diversity_metrics.ipynb
-  - src/ (utility modules)
-  - main.py (demo / example runner)
-  - README.md
-
-  ### Getting Started
-  1. Create a Python environment (Python 3.11 recommended).
-  2. Install dependencies:
-
-  ```bash
-  pip install -r requirements.txt
-  ```
-
-  3. Run the notebooks in order: EDA → Preprocessing → Model → Hybrid → Metrics.
-  4. Optionally run `main.py` to see a demo Top-K recommendation workflow.
-
-  ### Results (summary)
-  - SVD provides strong rating predictions on the temporal split.
-  - The hybrid approach improves diversity and novelty while maintaining personalization.
-  - Explanations help surface why items are recommended (genre and liked examples).
-
-  ### Future Work
-  - Add tag or embedding-based content features.
-  - Explore session/context-aware models.
-  - Optimize long-term engagement with reinforcement learning.
----
-## 📫 Contact / Support
-
-- For questions, suggestions, or support, please open an issue on the [GitHub repository](https://github.com/Tarun-Chowdary/ReelSense/issues).
-- You can also reach out via email: yegi.2992@gmail.com
-
-We welcome feedback and contributions!
-
----
-
-  ### Author
-
-  Tarun Chowdary Yegi
-
-  ***
+- Swap the genre-overlap explanation for your notebook 05's fuller explainability logic — the `_explain()` function in `backend/main.py` is the place to plug it in.
+- The hybrid CF+content scoring from notebook 06 can replace the pure-SVD ranking in the `/api/recommend` endpoint if you want the website to reflect the hybrid model instead.
+- Deploying: any host that runs a Python process works (Render, Railway, Fly.io, a VPS). Just make sure `data/` and `models/` ship alongside `backend/`.
