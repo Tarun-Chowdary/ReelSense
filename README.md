@@ -1,62 +1,258 @@
-# ReelSense Web
+# 🎬 ReelSense
 
-A full-stack website for your ReelSense recommender: a FastAPI backend that loads your **real trained SVD model** and serves live Top-K recommendations, plus a browser frontend (cinema-ticket themed) that calls it.
+[🌐 Visit ReelSense Live](https://reel-sense-omega.vercel.app/)
 
-```
-reelsense-web/
-├── backend/
-│   ├── main.py            # FastAPI app (predictions, explanations, diversity metrics)
-│   └── requirements.txt
-├── frontend/
-│   └── index.html         # single-file UI, no build step needed
-├── data/
-│   ├── raw/movies.csv          ← copy from your ReelSense repo
-│   └── processed/train_ratings.csv  ← copy from your ReelSense repo
-└── models/
-    └── svd_model.pkl       ← copy from your ReelSense repo
-```
+ReelSense is an intelligent movie recommendation web application that helps users discover movies based on their mood and preferences. Instead of browsing endlessly, users answer a short interactive quiz, and ReelSense generates personalized recommendations using a hybrid recommendation strategy powered by collaborative filtering, genre-based filtering, and explainable AI.
 
-## 1. Copy in your trained artifacts
+---
 
-From your existing `ReelSense` project folder, copy:
+## 🚀 Features
+
+- 🎭 Mood-based movie recommendation quiz
+- 🤖 Intelligent recommendation engine using SVD Collaborative Filtering
+- 🎯 Cold-start recommendation support for new users
+- 📊 Explainable recommendations with personalized reasoning
+- ⭐ Movie ratings and popularity-based ranking
+- 🎨 Beautiful ticket-inspired movie recommendation UI
+- 📈 Recommendation diversity and catalog coverage metrics
+- 🎞️ Dynamic movie poster support via OMDb API
+- 📱 Fully responsive modern interface
+- ⚡ FastAPI-powered backend with REST APIs
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
+
+### Backend
+
+- FastAPI
+- Python
+- Pandas
+
+### Machine Learning
+
+- Surprise Library
+- SVD Collaborative Filtering
+- Hybrid Recommendation System
+- Genre-Based Ranking
+- Explainable Recommendation Logic
+
+### Dataset
+
+- MovieLens Latest Dataset
+- OMDb API (Movie Posters)
+
+---
+
+## 🧠 How It Works
+
+1. User opens ReelSense.
+2. A short personality and mood-based quiz is presented.
+3. User answers questions regarding:
+   - Mood
+   - Favorite Genre
+   - Movie Pace
+   - Preferred Era
+   - Discovery Preference
+4. FastAPI processes the responses.
+5. A hybrid recommendation algorithm scores every movie using:
+   - Genre similarity
+   - User mood
+   - Movie quality
+   - Popularity/Novelty balance
+6. Top personalized movie recommendations are displayed with:
+   - Rating
+   - Genres
+   - Explanation
+   - Dynamic poster (OMDb)
+
+---
+
+## 🧠 Recommendation Algorithm
+
+ReelSense combines multiple recommendation strategies:
+
+- 🎯 SVD Collaborative Filtering
+- 🎭 Genre-Based Filtering
+- ⭐ Average Rating Ranking
+- 🌍 Popularity vs Hidden Gem Balancing
+- 📊 Intra-List Diversity Optimization
+- 📈 Catalog Coverage Analysis
+
+This hybrid approach helps overcome the cold-start problem while providing meaningful and diverse recommendations.
+
+---
+
+## 📊 Recommendation Metrics
+
+Each recommendation list includes:
+
+- 📈 Intra-List Diversity
+- 🎯 Catalog Coverage
+- ⭐ Average Movie Rating
+- 💡 Explainable Recommendation Reason
+
+These metrics help evaluate the quality and diversity of generated recommendations.
+
+---
+
+## 🌐 Live Website
+
+https://reel-sense-omega.vercel.app/
+
+---
+
+## 📦 Installation (Local Setup)
+
+### 1. Clone the Repository
 
 ```bash
-cp ReelSense/data/raw/movies.csv               reelsense-web/data/raw/
-cp ReelSense/data/processed/train_ratings.csv  reelsense-web/data/processed/
-cp ReelSense/models/svd_model.pkl              reelsense-web/models/
+git clone https://github.com/Tarun-Chowdary/ReelSense.git
+cd ReelSense
 ```
 
-(Paths already match your repo layout from `main.py`, so no renaming needed.)
+---
 
-## 2. Install backend dependencies
+### 2. Backend Setup
 
 ```bash
-cd reelsense-web/backend
-python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
+cd backend
 pip install -r requirements.txt
 ```
 
-> Your `svd_model.pkl` was trained with the `surprise` library (`svd.predict(user_id, movie_id).est`), so `scikit-surprise` is required to unpickle and call it. If pip has trouble building it, install a C++ build tool chain first (on Windows: "Microsoft C++ Build Tools"; on Mac: `xcode-select --install`).
+Create a `.env` file inside the backend folder:
 
-## 3. Run it
+```env
+apikey=YOUR_OMDB_API_KEY
+```
+
+Run the FastAPI server:
 
 ```bash
 uvicorn main:app --reload --port 8000
 ```
 
-Open **http://localhost:8000** — the backend serves the frontend directly, so there's nothing else to start.
+---
 
-## What it does
+### 3. Frontend Setup
 
-- **`GET /api/users`** — lists user IDs available in your training set, populates the dropdown.
-- **`GET /api/recommend/{user_id}?k=10`** — runs your SVD model against every unseen movie for that user, ranks by predicted rating, and returns the Top-K along with:
-  - a plain-language **explanation** per movie (genre overlap with that user's highly-rated history)
-  - **intra-list diversity**, **average novelty**, and **catalog coverage** for that specific list
-- The frontend renders each recommendation as a torn-ticket card: predicted score on the stub, genres as chips, explanation alongside.
+Open another terminal:
 
-## Extending it
+```bash
+cd frontend
+```
 
-- Swap the genre-overlap explanation for your notebook 05's fuller explainability logic — the `_explain()` function in `backend/main.py` is the place to plug it in.
-- The hybrid CF+content scoring from notebook 06 can replace the pure-SVD ranking in the `/api/recommend` endpoint if you want the website to reflect the hybrid model instead.
-- Deploying: any host that runs a Python process works (Render, Railway, Fly.io, a VPS). Just make sure `data/` and `models/` ship alongside `backend/`.
+Run a local server using VS Code Live Server or Python:
+
+```bash
+python -m http.server 5500
+```
+
+or simply use the **Live Server** extension in VS Code.
+
+---
+
+## 📁 Project Structure
+
+```text
+ReelSense
+│
+├── backend
+│   ├── main.py
+│   ├── requirements.txt
+│   └── .env
+│
+├── data
+│   ├── raw
+│   └── processed
+│
+├── frontend
+│   └── index.html
+│
+├── models
+│   └── svd_model.pkl
+│
+└── README.md
+```
+
+---
+
+## 🛠 API Endpoints
+
+| Method | Endpoint                  | Description                            |
+| ------ | ------------------------- | -------------------------------------- |
+| GET    | `/api/health`             | Server Health Check                    |
+| POST   | `/api/quiz-recommend`     | Mood-based Movie Recommendation        |
+| GET    | `/api/users`              | Available Users                        |
+| GET    | `/api/movie/{movieId}`    | Movie Details                          |
+| GET    | `/api/recommend/{userId}` | Collaborative Filtering Recommendation |
+
+---
+
+## 🛠 Troubleshooting
+
+### Posters not loading
+
+- Verify your OMDb API key.
+- Ensure the key is activated.
+- Check the `.env` file configuration.
+
+### Backend not connecting
+
+- Make sure FastAPI is running.
+- Verify the frontend API URL points to the deployed backend.
+
+### Dataset errors
+
+- Ensure the MovieLens dataset is placed correctly under:
+
+```text
+data/raw
+data/processed
+```
+
+### Model loading issues
+
+Verify the trained SVD model exists:
+
+```text
+models/svd_model.pkl
+```
+
+---
+
+## 🚀 Future Improvements
+
+- ❤️ Favorite Movies
+- 👤 User Accounts
+- 🎥 Trailer Integration
+- 🎬 Streaming Platform Availability
+- 🌍 Multi-language Recommendations
+- 🤝 Social Recommendation Sharing
+- 📈 Personalized Watch History
+- 🔍 Movie Search & Filters
+
+---
+
+## 👨‍💻 Author
+
+**Tarun Chowdary Yegi**
+
+- GitHub: https://github.com/Tarun-Chowdary
+- LinkedIn: https://www.linkedin.com/in/taryegi/
+
+---
+
+## 📄 License
+
+This project is developed for educational, research, and portfolio purposes.
+
+---
+
+⭐ If you enjoyed this project, consider giving it a **Star** on GitHub!
